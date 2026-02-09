@@ -30,27 +30,50 @@ const SalesList: React.FC<Props> = ({ orders, inventoryStats, customers, getOrde
 
   const availableProducts = inventoryStats.filter(p => p.currentStock > 0);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const orderId = generateId();
     const customer = customers.find(c => c.id === formData.customerId);
     const total = formData.quantity * formData.salePrice;
+
+    // Fix: due_date cannot be null in DB. 
+    // If isPaid (finished), Set dueDate = Order Date (for record keeping) or Today.
+    // If not paid, use the user selected dueDate.
+    const finalDueDate = isPaid ? formData.date : formData.dueDate;
+
     const newOrder: SaleOrder = {
-      id: orderId, code: generateCode('SO'), date: formData.date,
+      id: orderId,
+      code: generateCode('SO'),
+      date: formData.date,
       customerId: activeTab === 'WHOLESALE' ? formData.customerId : undefined,
       agentName: activeTab === 'WHOLESALE' ? (customer?.name || 'Đại lý') : (formData.retailCustomerInfo || 'Khách lẻ'),
-      saleType: activeTab, simTypeId: formData.simTypeId,
-      quantity: Number(formData.quantity) || 1, salePrice: Number(formData.salePrice) || 0,
-      dueDate: isPaid ? null : formData.dueDate, dueDateChanges: 0, note: formData.note, isFinished: isPaid
+      saleType: activeTab,
+      simTypeId: formData.simTypeId,
+      quantity: Number(formData.quantity) || 1,
+      salePrice: Number(formData.salePrice) || 0,
+      dueDate: finalDueDate,
+      dueDateChanges: 0,
+      note: formData.note,
+      isFinished: isPaid
     };
+
+    // Fix: Execute Add Order FIRST to ensure Foreign Key exists
+    await onAdd(newOrder);
+
     if (isPaid) {
-      onAddTransaction({
-        id: generateId(), code: generateCode('TX'), type: 'IN', date: formData.date,
-        amount: total, category: activeTab === 'WHOLESALE' ? 'Thu bán sỉ' : 'Thu bán lẻ',
-        method: paymentMethod, saleOrderId: orderId, note: `Thu đơn ${newOrder.code}`
+      await onAddTransaction({
+        id: generateId(),
+        code: generateCode('TX'),
+        type: 'IN',
+        date: formData.date,
+        amount: total,
+        category: activeTab === 'WHOLESALE' ? 'Thu bán sỉ' : 'Thu bán lẻ',
+        method: paymentMethod,
+        saleOrderId: orderId,
+        note: `Thu đơn ${newOrder.code}`
       });
     }
-    onAdd(newOrder);
+
     setIsModalOpen(false);
     setFormData({ customerId: '', retailCustomerInfo: '', simTypeId: '', quantity: 1, salePrice: 0, date: new Date().toISOString().split('T')[0], dueDate: '', note: '' });
   };
