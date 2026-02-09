@@ -13,6 +13,7 @@ import CustomerCRM from './components/CustomerCRM';
 import Reports from './components/Reports';
 import DataManager from './components/DataManager';
 import { Auth } from './components/Auth';
+import { DataMigration } from './components/DataMigration';
 import { ShieldCheck, Package, ShoppingCart, Wallet, Tags, Users, Database, Cpu, Menu, X, LogOut } from 'lucide-react';
 import { generateCode, generateId } from './utils';
 
@@ -144,6 +145,17 @@ function App() {
     return <Auth />;
   }
 
+  if (store.loading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-600 font-semibold">Đang tải dữ liệu...</p>
+        </div>
+      </div>
+    );
+  }
+
   const handleAddInventory = (pkg: SimPackage, method: 'TRANSFER' | 'CASH' | 'CREDIT') => {
     store.addPackage(pkg);
     if (method !== 'CREDIT') {
@@ -172,73 +184,76 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row antialiased font-['Inter']">
-      {/* Header cho Mobile */}
-      <div className="md:hidden bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-[60] shadow-sm">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-            <Cpu className="text-white w-5 h-5" />
+    <>
+      <DataMigration />
+      <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row antialiased font-['Inter']">
+        {/* Header cho Mobile */}
+        <div className="md:hidden bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-[60] shadow-sm">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+              <Cpu className="text-white w-5 h-5" />
+            </div>
+            <h1 className="text-sm font-black uppercase tracking-tighter">SIM<span className="text-indigo-600">Pro</span></h1>
           </div>
-          <h1 className="text-sm font-black uppercase tracking-tighter">SIM<span className="text-indigo-600">Pro</span></h1>
-        </div>
-        <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2 text-slate-600 bg-slate-100 rounded-lg transition-all active:scale-95">
-          {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-        </button>
-      </div>
-
-      {/* Navigation (Sidebar Desktop & Mobile Overlay) */}
-      <nav className={`fixed inset-y-0 left-0 w-64 bg-white border-r border-slate-200 z-[55] transform transition-transform duration-300 ease-in-out md:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'}`}>
-        <div className="hidden md:flex items-center gap-3 p-6 border-b border-slate-100">
-          <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-            <Cpu className="text-white w-6 h-6" />
-          </div>
-          <h1 className="text-xl font-black tracking-tighter uppercase">SIM<span className="text-indigo-600">Wholesale</span></h1>
-        </div>
-        <div className="p-4 flex flex-col gap-1 overflow-y-auto h-[calc(100vh-80px)] md:h-auto no-scrollbar pt-20 md:pt-4">
-          {menu.map(item => (
-            <button
-              key={item.id}
-              onClick={() => handleTabChange(item.id)}
-              className={`flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all ${activeTab === item.id ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-100 font-bold' : 'text-slate-500 hover:bg-slate-50 font-semibold'}`}
-            >
-              <item.icon className="w-5 h-5" />
-              <span className="text-xs uppercase tracking-widest">{item.label}</span>
-            </button>
-          ))}
-        </div>
-
-        <div className="absolute bottom-0 left-0 w-full p-4 border-t border-slate-50">
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-rose-500 hover:bg-rose-50 transition-all font-black"
-          >
-            <LogOut className="w-5 h-5" />
-            <span className="text-xs uppercase tracking-widest">Đăng xuất</span>
+          <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2 text-slate-600 bg-slate-100 rounded-lg transition-all active:scale-95">
+            {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
-      </nav>
 
-      {/* Overlay cho Mobile khi mở menu */}
-      {isMobileMenuOpen && <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 md:hidden" onClick={() => setIsMobileMenuOpen(false)}></div>}
+        {/* Navigation (Sidebar Desktop & Mobile Overlay) */}
+        <nav className={`fixed inset-y-0 left-0 w-64 bg-white border-r border-slate-200 z-[55] transform transition-transform duration-300 ease-in-out md:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'}`}>
+          <div className="hidden md:flex items-center gap-3 p-6 border-b border-slate-100">
+            <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+              <Cpu className="text-white w-6 h-6" />
+            </div>
+            <h1 className="text-xl font-black tracking-tighter uppercase">SIM<span className="text-indigo-600">Wholesale</span></h1>
+          </div>
+          <div className="p-4 flex flex-col gap-1 overflow-y-auto h-[calc(100vh-80px)] md:h-auto no-scrollbar pt-20 md:pt-4">
+            {menu.map(item => (
+              <button
+                key={item.id}
+                onClick={() => handleTabChange(item.id)}
+                className={`flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all ${activeTab === item.id ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-100 font-bold' : 'text-slate-500 hover:bg-slate-50 font-semibold'}`}
+              >
+                <item.icon className="w-5 h-5" />
+                <span className="text-xs uppercase tracking-widest">{item.label}</span>
+              </button>
+            ))}
+          </div>
 
-      <main className="flex-1 md:ml-64 p-3 md:p-8">
-        <div className="max-w-7xl mx-auto pb-10">
-          {activeTab === 'CONTROL_CENTER' && (
-            <ControlCenter inventory={inventoryStats} orders={orderStats} transactions={store.transactions} customers={customerStats}
-              onNavigateToCalendar={() => { handleTabChange('FINANCE'); setReportSubTab('CALENDAR'); }}
-              onNavigateToDebt={() => { handleTabChange('FINANCE'); setReportSubTab('DEBT'); }}
-            />
-          )}
-          {activeTab === 'FINANCE' && <Reports transactions={store.transactions} orders={orderStats} inventoryStats={inventoryStats} onUpdateDueDate={store.updateOrderDueDate} initialTab={reportSubTab} />}
-          {activeTab === 'SALES' && <SalesList orders={store.orders} inventoryStats={inventoryStats} customers={store.customers} getOrderStats={(o) => orderStats.find(os => os.id === o.id) || ({} as any)} onAdd={store.addOrder} onAddTransaction={store.addTransaction} onDelete={store.deleteOrder} onUpdateDueDate={store.updateOrderDueDate} />}
-          {activeTab === 'CASHFLOW' && <CashFlow transactions={store.transactions} orders={orderStats} packages={store.packages} onAdd={store.addTransaction} onDelete={store.deleteTransaction} />}
-          {activeTab === 'INVENTORY' && <SimInventory inventoryStats={inventoryStats} simTypes={store.simTypes} onAdd={handleAddInventory} onDeleteBatch={store.deletePackage} onNavigateToProducts={() => handleTabChange('PRODUCTS')} />}
-          {activeTab === 'CUSTOMERS' && <CustomerCRM customers={customerStats} onAdd={store.addCustomer} onUpdate={store.updateCustomer} onDelete={store.deleteCustomer} />}
-          {activeTab === 'PRODUCTS' && <ProductManager simTypes={store.simTypes} onAdd={store.addSimType} onDelete={store.deleteSimType} />}
-          {activeTab === 'DATA' && <DataManager fullData={store.fullData} onImport={store.importFullData} />}
-        </div>
-      </main>
-    </div>
+          <div className="absolute bottom-0 left-0 w-full p-4 border-t border-slate-50">
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-rose-500 hover:bg-rose-50 transition-all font-black"
+            >
+              <LogOut className="w-5 h-5" />
+              <span className="text-xs uppercase tracking-widest">Đăng xuất</span>
+            </button>
+          </div>
+        </nav>
+
+        {/* Overlay cho Mobile khi mở menu */}
+        {isMobileMenuOpen && <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 md:hidden" onClick={() => setIsMobileMenuOpen(false)}></div>}
+
+        <main className="flex-1 md:ml-64 p-3 md:p-8">
+          <div className="max-w-7xl mx-auto pb-10">
+            {activeTab === 'CONTROL_CENTER' && (
+              <ControlCenter inventory={inventoryStats} orders={orderStats} transactions={store.transactions} customers={customerStats}
+                onNavigateToCalendar={() => { handleTabChange('FINANCE'); setReportSubTab('CALENDAR'); }}
+                onNavigateToDebt={() => { handleTabChange('FINANCE'); setReportSubTab('DEBT'); }}
+              />
+            )}
+            {activeTab === 'FINANCE' && <Reports transactions={store.transactions} orders={orderStats} inventoryStats={inventoryStats} onUpdateDueDate={store.updateOrderDueDate} initialTab={reportSubTab} />}
+            {activeTab === 'SALES' && <SalesList orders={store.orders} inventoryStats={inventoryStats} customers={store.customers} getOrderStats={(o) => orderStats.find(os => os.id === o.id) || ({} as any)} onAdd={store.addOrder} onAddTransaction={store.addTransaction} onDelete={store.deleteOrder} onUpdateDueDate={store.updateOrderDueDate} />}
+            {activeTab === 'CASHFLOW' && <CashFlow transactions={store.transactions} orders={orderStats} packages={store.packages} onAdd={store.addTransaction} onDelete={store.deleteTransaction} />}
+            {activeTab === 'INVENTORY' && <SimInventory inventoryStats={inventoryStats} simTypes={store.simTypes} onAdd={handleAddInventory} onDeleteBatch={store.deletePackage} onNavigateToProducts={() => handleTabChange('PRODUCTS')} />}
+            {activeTab === 'CUSTOMERS' && <CustomerCRM customers={customerStats} onAdd={store.addCustomer} onUpdate={store.updateCustomer} onDelete={store.deleteCustomer} />}
+            {activeTab === 'PRODUCTS' && <ProductManager simTypes={store.simTypes} onAdd={store.addSimType} onDelete={store.deleteSimType} />}
+            {activeTab === 'DATA' && <DataManager fullData={store.fullData} onImport={store.importFullData} />}
+          </div>
+        </main>
+      </div>
+    </>
   );
 }
 
