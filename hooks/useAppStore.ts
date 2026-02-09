@@ -52,26 +52,40 @@ export const useAppStore = () => {
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
 
-  // Load data from Supabase on mount
+  // Handle Auth Session
   useEffect(() => {
-    const loadData = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        setLoading(false);
-        return;
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        setUserId(session.user.id);
       }
+    });
 
-      setUserId(user.id);
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUserId(session?.user?.id || null);
+    });
 
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Load data when userId changes
+  useEffect(() => {
+    if (!userId) {
+      setLoading(false);
+      return;
+    }
+
+    const loadData = async () => {
+      setLoading(true);
       try {
-        // Load all data in parallel
         const [simTypesRes, customersRes, packagesRes, ordersRes, transactionsRes, logsRes] = await Promise.all([
-          supabase.from('sim_types').select('*').eq('user_id', user.id),
-          supabase.from('customers').select('*').eq('user_id', user.id),
-          supabase.from('sim_packages').select('*').eq('user_id', user.id),
-          supabase.from('sale_orders').select('*').eq('user_id', user.id),
-          supabase.from('transactions').select('*').eq('user_id', user.id),
-          supabase.from('due_date_logs').select('*').eq('user_id', user.id)
+          supabase.from('sim_types').select('*').eq('user_id', userId),
+          supabase.from('customers').select('*').eq('user_id', userId),
+          supabase.from('sim_packages').select('*').eq('user_id', userId),
+          supabase.from('sale_orders').select('*').eq('user_id', userId),
+          supabase.from('transactions').select('*').eq('user_id', userId),
+          supabase.from('due_date_logs').select('*').eq('user_id', userId)
         ]);
 
         setData({
@@ -90,7 +104,7 @@ export const useAppStore = () => {
     };
 
     loadData();
-  }, []);
+  }, [userId]);
 
   // Real-time subscriptions
   useEffect(() => {
