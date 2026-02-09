@@ -46,8 +46,8 @@ export interface CustomerWithStats extends Customer {
 export interface DueDateLog {
   id: string;
   orderId: string;
-  oldDate: string;
-  newDate: string;
+  oldDate: string | null;
+  newDate: string | null;
   reason: string;
   updatedAt: string;
 }
@@ -63,7 +63,7 @@ export interface SaleOrder {
   simPackageId?: string;
   quantity: number;
   salePrice: number;
-  dueDate: string;
+  dueDate: string | null;
   dueDateChanges: number;
   note: string;
   isFinished: boolean;

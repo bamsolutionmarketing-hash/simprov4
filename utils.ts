@@ -6,7 +6,7 @@ export const formatCurrency = (amount: number): string => {
   }).format(amount);
 };
 
-export const formatDate = (dateString: string): string => {
+export const formatDate = (dateString: string | null | undefined): string => {
   if (!dateString) return '';
   const date = new Date(dateString);
   return new Intl.DateTimeFormat('vi-VN').format(date);

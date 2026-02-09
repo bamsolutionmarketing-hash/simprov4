@@ -41,7 +41,7 @@ const SalesList: React.FC<Props> = ({ orders, inventoryStats, customers, getOrde
       agentName: activeTab === 'WHOLESALE' ? (customer?.name || 'Đại lý') : (formData.retailCustomerInfo || 'Khách lẻ'),
       saleType: activeTab, simTypeId: formData.simTypeId,
       quantity: Number(formData.quantity) || 1, salePrice: Number(formData.salePrice) || 0,
-      dueDate: isPaid ? '' : formData.dueDate, dueDateChanges: 0, note: formData.note, isFinished: isPaid
+      dueDate: isPaid ? null : formData.dueDate, dueDateChanges: 0, note: formData.note, isFinished: isPaid
     };
     if (isPaid) {
       onAddTransaction({
