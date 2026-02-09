@@ -13,7 +13,13 @@ export const formatDate = (dateString: string): string => {
 };
 
 export const generateId = (): string => {
-  return Math.random().toString(36).substr(2, 9);
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
 };
 
 export const generateCode = (prefix: string): string => {
@@ -26,7 +32,7 @@ export const generateCode = (prefix: string): string => {
 // New Helper: Generate Customer ID
 export const generateCID = (name: string, phone: string, email: string): string => {
   const prefix = 'KH';
-  
+
   let mid = '';
   if (phone && phone.length >= 4) {
     mid = phone.slice(-4);
@@ -39,11 +45,11 @@ export const generateCID = (name: string, phone: string, email: string): string 
   const nameParts = name.trim().split(' ');
   let suffix = '';
   if (nameParts.length >= 2) {
-      suffix = (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase();
+    suffix = (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase();
   } else if (name.length >= 2) {
-      suffix = name.slice(0, 2).toUpperCase();
+    suffix = name.slice(0, 2).toUpperCase();
   } else {
-      suffix = 'XX';
+    suffix = 'XX';
   }
 
   return `${prefix}-${mid}-${suffix}`;
