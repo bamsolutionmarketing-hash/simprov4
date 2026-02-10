@@ -16,7 +16,6 @@ interface Props {
 const CashFlow: React.FC<Props> = ({ transactions, orders, packages, onAdd, onDelete }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [transactionType, setTransactionType] = useState<'IN' | 'OUT'>('IN');
-  const [transactionType, setTransactionType] = useState<'IN' | 'OUT'>('IN');
   const [startDate, setStartDate] = useState(getStartOfMonth());
   const [endDate, setEndDate] = useState(getEndOfMonth());
   const [formData, setFormData] = useState({

@@ -1,20 +1,23 @@
 import React, { useState } from 'react';
-import { Customer, CustomerWithStats } from '../types';
-import { generateId, generateCID, formatCurrency } from '../utils';
-import { Plus, Trash2, Edit2, Users, Search, MapPin, Phone } from 'lucide-react';
+import { Customer, CustomerWithStats, SaleOrderWithStats } from '../types';
+import { generateId, generateCID, formatCurrency, getStartOfMonth, getEndOfMonth } from '../utils';
+import { Plus, Trash2, Edit2, Users, Search, MapPin, Phone, Calendar as CalendarIcon } from 'lucide-react';
 import { Modal, ModalActions, Input, Select } from './base';
 
 interface Props {
   customers: CustomerWithStats[];
+  orders: SaleOrderWithStats[];
   onAdd: (c: Customer) => void;
   onUpdate: (c: Customer) => void;
   onDelete: (id: string) => void;
 }
 
-const CustomerCRM: React.FC<Props> = ({ customers, onAdd, onUpdate, onDelete }) => {
+const CustomerCRM: React.FC<Props> = ({ customers, orders, onAdd, onUpdate, onDelete }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [editMode, setEditMode] = useState(false);
+  const [startDate, setStartDate] = useState(getStartOfMonth());
+  const [endDate, setEndDate] = useState(getEndOfMonth());
   const [formData, setFormData] = useState<Customer>({ id: '', cid: '', name: '', phone: '', email: '', address: '', type: 'RETAIL', note: '' });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -48,7 +51,12 @@ const CustomerCRM: React.FC<Props> = ({ customers, onAdd, onUpdate, onDelete }) 
         <div className="flex gap-2 w-full md:w-auto">
           <div className="relative flex-1 md:w-64">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input type="text" placeholder="Tìm theo tên hoặc SĐT..." className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-600 outline-none text-xs font-bold" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+            <input type="text" placeholder="Tìm tên/SĐT..." className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-600 outline-none text-[10px] font-bold" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+          </div>
+          <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-xl border border-slate-200">
+            <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="bg-transparent text-slate-700 text-[10px] font-bold uppercase tracking-widest focus:outline-none" />
+            <span className="text-slate-400">-</span>
+            <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="bg-transparent text-slate-700 text-[10px] font-bold uppercase tracking-widest focus:outline-none" />
           </div>
           <button onClick={() => { setEditMode(false); setFormData({ id: '', cid: '', name: '', phone: '', email: '', address: '', type: 'RETAIL', note: '' }); setIsModalOpen(true); }} className="bg-indigo-600 text-white px-6 py-2.5 rounded-2xl flex items-center gap-2 text-[10px] font-black uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"><Plus size={18} /> Thêm Mới</button>
         </div>
@@ -79,7 +87,9 @@ const CustomerCRM: React.FC<Props> = ({ customers, onAdd, onUpdate, onDelete }) 
               <div className="grid grid-cols-2 gap-3 pt-5 border-t border-slate-50">
                 <div className="bg-slate-50 p-4 rounded-3xl border border-slate-100 flex flex-col justify-center">
                   <p className="text-[8px] font-black text-slate-400 uppercase mb-1 tracking-widest leading-none">Doanh số</p>
-                  <p className="font-black text-slate-900 text-xs">{formatCurrency(c.gmv)}</p>
+                  <p className="font-black text-slate-900 text-xs">
+                    {formatCurrency(orders.filter(o => o.customerId === c.id && (!startDate || o.date >= startDate) && (!endDate || o.date <= endDate)).reduce((s, o) => s + o.totalAmount, 0))}
+                  </p>
                 </div>
                 <div className={`p-4 rounded-3xl border flex flex-col justify-center ${c.currentDebt > 0 ? 'bg-rose-50 border-rose-100' : 'bg-emerald-50 border-emerald-100'}`}>
                   <p className="text-[8px] font-black text-slate-400 uppercase mb-1 tracking-widest leading-none">Công nợ</p>

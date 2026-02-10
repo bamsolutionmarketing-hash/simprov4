@@ -247,7 +247,7 @@ function App() {
             {activeTab === 'SALES' && <SalesList orders={store.orders} inventoryStats={inventoryStats} customers={store.customers} getOrderStats={(o) => orderStats.find(os => os.id === o.id) || ({} as any)} onAdd={store.addOrder} onAddTransaction={store.addTransaction} onDelete={store.deleteOrder} onUpdateDueDate={store.updateOrderDueDate} />}
             {activeTab === 'CASHFLOW' && <CashFlow transactions={store.transactions} orders={orderStats} packages={store.packages} onAdd={store.addTransaction} onDelete={store.deleteTransaction} />}
             {activeTab === 'INVENTORY' && <SimInventory inventoryStats={inventoryStats} simTypes={store.simTypes} onAdd={handleAddInventory} onDeleteBatch={store.deletePackage} onNavigateToProducts={() => handleTabChange('PRODUCTS')} />}
-            {activeTab === 'CUSTOMERS' && <CustomerCRM customers={customerStats} onAdd={store.addCustomer} onUpdate={store.updateCustomer} onDelete={store.deleteCustomer} />}
+            {activeTab === 'CUSTOMERS' && <CustomerCRM customers={customerStats} orders={orderStats} onAdd={store.addCustomer} onUpdate={store.updateCustomer} onDelete={store.deleteCustomer} />}
             {activeTab === 'PRODUCTS' && <ProductManager simTypes={store.simTypes} onAdd={store.addSimType} onDelete={store.deleteSimType} />}
             {activeTab === 'DATA' && <DataManager fullData={store.fullData} onImport={store.importFullData} />}
           </div>
