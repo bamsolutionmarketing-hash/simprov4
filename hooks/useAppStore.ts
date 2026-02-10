@@ -326,19 +326,30 @@ export const useAppStore = () => {
   }, [userId]);
 
   // --- PACKAGES ---
-  const addPackage = useCallback(async (pkg: SimPackage) => {
-    if (!userId) { alert('Lỗi: Mất kết nối Auth (User ID null)'); return; }
-    const { data: inserted, error } = await supabase.from('sim_packages').insert({ ...toSnakeCase(pkg), user_id: userId }).select();
+  const addPackage = useCallback(async (pkg: SimPackage): Promise<void> => {
+    if (!userId) {
+      alert('Lỗi: Mất kết nối Auth (User ID null)');
+      throw new Error('User ID null');
+    }
+    const { data: inserted, error } = await supabase
+      .from('sim_packages')
+      .insert({ ...toSnakeCase(pkg), user_id: userId })
+      .select();
+
     if (error) {
       console.error('Error adding package:', error);
       alert(`Lỗi thêm gói sim: ${error.message}`);
-    } else if (inserted && inserted[0]) {
+      throw error;
+    }
+
+    if (inserted && inserted[0]) {
       setData(prev => {
         if (prev.packages.some(item => item.id === inserted[0].id)) return prev;
         return { ...prev, packages: [toCamelCase(inserted[0]), ...prev.packages] };
       });
     }
   }, [userId]);
+
 
   const deletePackage = useCallback(async (id: string) => {
     if (!userId) return;
@@ -347,19 +358,30 @@ export const useAppStore = () => {
   }, [userId]);
 
   // --- ORDERS ---
-  const addOrder = useCallback(async (order: SaleOrder) => {
-    if (!userId) { alert('Lỗi: Mất kết nối Auth (User ID null)'); return; }
-    const { data: inserted, error } = await supabase.from('sale_orders').insert({ ...toSnakeCase(order), user_id: userId }).select();
+  const addOrder = useCallback(async (order: SaleOrder): Promise<void> => {
+    if (!userId) {
+      alert('Lỗi: Mất kết nối Auth (User ID null)');
+      throw new Error('User ID null');
+    }
+    const { data: inserted, error } = await supabase
+      .from('sale_orders')
+      .insert({ ...toSnakeCase(order), user_id: userId })
+      .select();
+
     if (error) {
       console.error('Error adding order:', error);
       alert(`Lỗi thêm đơn hàng: ${error.message}`);
-    } else if (inserted && inserted[0]) {
+      throw error;
+    }
+
+    if (inserted && inserted[0]) {
       setData(prev => {
         if (prev.orders.some(item => item.id === inserted[0].id)) return prev;
         return { ...prev, orders: [toCamelCase(inserted[0]), ...prev.orders] };
       });
     }
   }, [userId]);
+
 
   const deleteOrder = useCallback(async (id: string) => {
     if (!userId) return;
@@ -387,19 +409,30 @@ export const useAppStore = () => {
   }, [userId, data.orders]);
 
   // --- TRANSACTIONS ---
-  const addTransaction = useCallback(async (tx: Transaction) => {
-    if (!userId) { alert('Lỗi: Mất kết nối Auth (User ID null)'); return; }
-    const { data: inserted, error } = await supabase.from('transactions').insert({ ...toSnakeCase(tx), user_id: userId }).select();
+  const addTransaction = useCallback(async (tx: Transaction): Promise<void> => {
+    if (!userId) {
+      alert('Lỗi: Mất kết nối Auth (User ID null)');
+      throw new Error('User ID null');
+    }
+    const { data: inserted, error } = await supabase
+      .from('transactions')
+      .insert({ ...toSnakeCase(tx), user_id: userId })
+      .select();
+
     if (error) {
       console.error('Error adding transaction:', error);
       alert(`Lỗi thêm giao dịch: ${error.message}`);
-    } else if (inserted && inserted[0]) {
+      throw error;
+    }
+
+    if (inserted && inserted[0]) {
       setData(prev => {
         if (prev.transactions.some(item => item.id === inserted[0].id)) return prev;
         return { ...prev, transactions: [toCamelCase(inserted[0]), ...prev.transactions] };
       });
     }
   }, [userId]);
+
 
   const deleteTransaction = useCallback(async (id: string) => {
     if (!userId) return;
@@ -408,13 +441,23 @@ export const useAppStore = () => {
   }, [userId]);
 
   // --- SIM TYPES ---
-  const addSimType = useCallback(async (type: SimType) => {
-    if (!userId) { alert('Lỗi: Mất kết nối Auth (User ID null)'); return; }
-    const { data: inserted, error } = await supabase.from('sim_types').insert({ ...toSnakeCase(type), user_id: userId }).select();
+  const addSimType = useCallback(async (type: SimType): Promise<void> => {
+    if (!userId) {
+      alert('Lỗi: Mất kết nối Auth (User ID null)');
+      throw new Error('User ID null');
+    }
+    const { data: inserted, error } = await supabase
+      .from('sim_types')
+      .insert({ ...toSnakeCase(type), user_id: userId })
+      .select();
+
     if (error) {
       console.error('Error adding sim type:', error);
       alert(`Lỗi thêm loại sim: ${error.message}`);
-    } else if (inserted && inserted[0]) {
+      throw error;
+    }
+
+    if (inserted && inserted[0]) {
       setData(prev => {
         if (prev.simTypes.some(item => item.id === inserted[0].id)) return prev;
         return { ...prev, simTypes: [toCamelCase(inserted[0]), ...prev.simTypes] };
@@ -429,13 +472,23 @@ export const useAppStore = () => {
   }, [userId]);
 
   // --- CUSTOMERS ---
-  const addCustomer = useCallback(async (customer: Customer) => {
-    if (!userId) { alert('Lỗi: Mất kết nối Auth (User ID null)'); return; }
-    const { data: inserted, error } = await supabase.from('customers').insert({ ...toSnakeCase(customer), user_id: userId }).select();
+  const addCustomer = useCallback(async (customer: Customer): Promise<void> => {
+    if (!userId) {
+      alert('Lỗi: Mất kết nối Auth (User ID null)');
+      throw new Error('User ID null');
+    }
+    const { data: inserted, error } = await supabase
+      .from('customers')
+      .insert({ ...toSnakeCase(customer), user_id: userId })
+      .select();
+
     if (error) {
       console.error('Error adding customer:', error);
       alert(`Lỗi thêm khách hàng: ${error.message}`);
-    } else if (inserted && inserted[0]) {
+      throw error;
+    }
+
+    if (inserted && inserted[0]) {
       setData(prev => {
         if (prev.customers.some(item => item.id === inserted[0].id)) return prev;
         return { ...prev, customers: [toCamelCase(inserted[0]), ...prev.customers] };

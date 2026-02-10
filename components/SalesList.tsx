@@ -57,25 +57,30 @@ const SalesList: React.FC<Props> = ({ orders, inventoryStats, customers, getOrde
       isFinished: isPaid
     };
 
-    // Fix: Execute Add Order FIRST to ensure Foreign Key exists
-    await onAdd(newOrder);
+    try {
+      // Fix: Execute Add Order FIRST to ensure Foreign Key exists
+      await onAdd(newOrder);
 
-    if (isPaid) {
-      await onAddTransaction({
-        id: generateId(),
-        code: generateCode('TX'),
-        type: 'IN',
-        date: formData.date,
-        amount: total,
-        category: activeTab === 'WHOLESALE' ? 'Thu bán sỉ' : 'Thu bán lẻ',
-        method: paymentMethod,
-        saleOrderId: orderId,
-        note: `Thu đơn ${newOrder.code}`
-      });
+      if (isPaid) {
+        await onAddTransaction({
+          id: generateId(),
+          code: generateCode('TX'),
+          type: 'IN',
+          date: formData.date,
+          amount: total,
+          category: activeTab === 'WHOLESALE' ? 'Thu bán sỉ' : 'Thu bán lẻ',
+          method: paymentMethod,
+          saleOrderId: orderId,
+          note: `Thu đơn ${newOrder.code}`
+        });
+      }
+
+      setIsModalOpen(false);
+      setFormData({ customerId: '', retailCustomerInfo: '', simTypeId: '', quantity: 1, salePrice: 0, date: new Date().toISOString().split('T')[0], dueDate: '', note: '' });
+    } catch (error) {
+      console.error('Error creating order:', error);
+      // Error alerts are already shown by addOrder/addTransaction
     }
-
-    setIsModalOpen(false);
-    setFormData({ customerId: '', retailCustomerInfo: '', simTypeId: '', quantity: 1, salePrice: 0, date: new Date().toISOString().split('T')[0], dueDate: '', note: '' });
   };
 
   const filteredOrders = useMemo(() => {
