@@ -84,8 +84,8 @@ const CashFlow: React.FC<Props> = ({ transactions, orders, packages, onAdd, onDe
           <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="bg-transparent text-slate-700 text-[10px] font-bold uppercase tracking-widest focus:outline-none" />
         </div>
         <div className="flex gap-2 w-full md:w-auto">
-          <button onClick={() => { setTransactionType('IN'); setIsModalOpen(true); }} className="flex-1 md:flex-none bg-emerald-600 text-white px-4 py-2.5 rounded-xl font-bold flex items-center justify-center gap-1.5 text-[9px] uppercase tracking-widest shadow-lg shadow-emerald-50"><Plus size={14} /> Thu</button>
-          <button onClick={() => { setTransactionType('OUT'); setIsModalOpen(true); }} className="flex-1 md:flex-none bg-rose-600 text-white px-4 py-2.5 rounded-xl font-bold flex items-center justify-center gap-1.5 text-[9px] uppercase tracking-widest shadow-lg shadow-rose-50"><Plus size={14} /> Chi</button>
+          <button onClick={() => { setTransactionType('IN'); setFormData({ ...formData, category: 'Thu bán sỉ' }); setIsModalOpen(true); }} className="flex-1 md:flex-none bg-emerald-600 text-white px-4 py-2.5 rounded-xl font-bold flex items-center justify-center gap-1.5 text-[9px] uppercase tracking-widest shadow-lg shadow-emerald-50"><Plus size={14} /> Thu</button>
+          <button onClick={() => { setTransactionType('OUT'); setFormData({ ...formData, category: 'Chi nhập SIM' }); setIsModalOpen(true); }} className="flex-1 md:flex-none bg-rose-600 text-white px-4 py-2.5 rounded-xl font-bold flex items-center justify-center gap-1.5 text-[9px] uppercase tracking-widest shadow-lg shadow-rose-50"><Plus size={14} /> Chi</button>
         </div>
       </div>
 

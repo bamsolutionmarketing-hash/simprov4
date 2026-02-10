@@ -18,7 +18,7 @@ const CustomerCRM: React.FC<Props> = ({ customers, orders, onAdd, onUpdate, onDe
   const [editMode, setEditMode] = useState(false);
   const [startDate, setStartDate] = useState(getStartOfMonth());
   const [endDate, setEndDate] = useState(getEndOfMonth());
-  const [formData, setFormData] = useState<Customer>({ id: '', cid: '', name: '', phone: '', email: '', address: '', type: 'RETAIL', note: '' });
+  const [formData, setFormData] = useState<Customer>({ id: '', cid: '', name: '', phone: '', email: '', address: '', type: 'WHOLESALE', note: '' });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,7 +58,7 @@ const CustomerCRM: React.FC<Props> = ({ customers, orders, onAdd, onUpdate, onDe
             <span className="text-slate-400">-</span>
             <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="bg-transparent text-slate-700 text-[10px] font-bold uppercase tracking-widest focus:outline-none" />
           </div>
-          <button onClick={() => { setEditMode(false); setFormData({ id: '', cid: '', name: '', phone: '', email: '', address: '', type: 'RETAIL', note: '' }); setIsModalOpen(true); }} className="bg-indigo-600 text-white px-6 py-2.5 rounded-2xl flex items-center gap-2 text-[10px] font-black uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"><Plus size={18} /> Thêm Mới</button>
+          <button onClick={() => { setEditMode(false); setFormData({ id: '', cid: '', name: '', phone: '', email: '', address: '', type: 'WHOLESALE', note: '' }); setIsModalOpen(true); }} className="bg-indigo-600 text-white px-6 py-2.5 rounded-2xl flex items-center gap-2 text-[10px] font-black uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"><Plus size={18} /> Thêm Mới</button>
         </div>
       </div>
 
@@ -133,7 +133,6 @@ const CustomerCRM: React.FC<Props> = ({ customers, orders, onAdd, onUpdate, onDe
           </div>
           <div className="grid grid-cols-2 gap-4">
             <Select label="Cấp đối tác" value={formData.type} onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}>
-              <option value="RETAIL">Khách Lẻ</option>
               <option value="WHOLESALE">Đại Lý (Wholesale)</option>
             </Select>
             <Input type="text" label="Địa chỉ giao dịch" value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} />
