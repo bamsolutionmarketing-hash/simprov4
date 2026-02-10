@@ -62,6 +62,7 @@ interface ModalActionsProps {
     confirmText?: string;
     confirmColor?: 'indigo' | 'emerald' | 'rose' | 'blue';
     isSubmit?: boolean;
+    isLoading?: boolean;
 }
 
 const confirmColorClasses: Record<string, string> = {
@@ -77,22 +78,26 @@ export const ModalActions: React.FC<ModalActionsProps> = ({
     cancelText = 'Hủy',
     confirmText = 'Xác nhận',
     confirmColor = 'indigo',
-    isSubmit = true
+    isSubmit = true,
+    isLoading = false
 }) => {
     return (
         <div className="flex gap-3 pt-4">
             <button
                 type="button"
                 onClick={onCancel}
-                className="flex-1 py-4 bg-slate-100 text-slate-500 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-200"
+                disabled={isLoading}
+                className="flex-1 py-4 bg-slate-100 text-slate-500 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 {cancelText}
             </button>
             <button
                 type={isSubmit ? 'submit' : 'button'}
                 onClick={isSubmit ? undefined : onConfirm}
-                className={`flex-1 py-4 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg ${confirmColorClasses[confirmColor]}`}
+                disabled={isLoading}
+                className={`flex-1 py-4 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg ${confirmColorClasses[confirmColor]} disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2`}
             >
+                {isLoading && <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
                 {confirmText}
             </button>
         </div>

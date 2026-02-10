@@ -28,17 +28,34 @@ const SalesList: React.FC<Props> = ({ orders, inventoryStats, customers, getOrde
     salePrice: 0, date: new Date().toISOString().split('T')[0], dueDate: '', note: ''
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const availableProducts = inventoryStats.filter(p => p.currentStock > 0);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
+
+    // Validation
+    if (!formData.date) {
+      alert('Vui lòng chọn ngày bán');
+      return;
+    }
+
+    if (!isPaid && !formData.dueDate) {
+      alert('Vui lòng chọn hạn khách trả nợ');
+      return;
+    }
+
+    setIsSubmitting(true);
+
     const orderId = generateId();
     const customer = customers.find(c => c.id === formData.customerId);
     const total = formData.quantity * formData.salePrice;
 
-    // Fix: due_date cannot be null in DB. 
-    // If isPaid (finished), Set dueDate = Order Date (for record keeping) or Today.
-    // If not paid, use the user selected dueDate.
+    // Fix: Ensure valid due date.
+    // If paid, due date is same as order date (for records).
+    // If debt, must use user selected due date.
     const finalDueDate = isPaid ? formData.date : formData.dueDate;
 
     const newOrder: SaleOrder = {
@@ -59,6 +76,7 @@ const SalesList: React.FC<Props> = ({ orders, inventoryStats, customers, getOrde
 
     try {
       // Fix: Execute Add Order FIRST to ensure Foreign Key exists
+      // The onAdd function throws if it fails, skipping the transaction creation
       await onAdd(newOrder);
 
       if (isPaid) {
@@ -79,7 +97,10 @@ const SalesList: React.FC<Props> = ({ orders, inventoryStats, customers, getOrde
       setFormData({ customerId: '', retailCustomerInfo: '', simTypeId: '', quantity: 1, salePrice: 0, date: new Date().toISOString().split('T')[0], dueDate: '', note: '' });
     } catch (error) {
       console.error('Error creating order:', error);
-      // Error alerts are already shown by addOrder/addTransaction
+      // checking strict equality for error message is risky but helpful for context
+      // User will see the alert from useAppStore
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -194,7 +215,7 @@ const SalesList: React.FC<Props> = ({ orders, inventoryStats, customers, getOrde
             <Input variant="danger" type="date" required label="Hạn khách trả nợ (*)" value={formData.dueDate} onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })} />
           )}
 
-          <ModalActions onCancel={() => setIsModalOpen(false)} confirmText="Chốt Đơn" />
+          <ModalActions onCancel={() => setIsModalOpen(false)} confirmText="Chốt Đơn" isLoading={isSubmitting} />
         </form>
       </Modal>
     </div>
