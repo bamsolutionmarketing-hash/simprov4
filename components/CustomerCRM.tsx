@@ -98,7 +98,23 @@ const CustomerCRM: React.FC<Props> = ({ customers, orders, onAdd, onUpdate, onDe
               </div>
               <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
                 <button onClick={() => { setEditMode(true); setFormData(c); setIsModalOpen(true); }} className="p-2 bg-white border border-slate-200 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-100 shadow-sm transition-all"><Edit2 size={14} /></button>
-                <button onClick={() => onDelete(c.id)} className="p-2 bg-white border border-slate-200 rounded-xl hover:bg-rose-50 hover:text-rose-500 hover:border-rose-100 shadow-sm transition-all"><Trash2 size={14} /></button>
+                {c.currentDebt > 0 ? (
+                  <button
+                    onClick={() => alert('Không thể xóa đối tác đang còn công nợ! Vui lòng thanh toán hết nợ trước khi xóa.')}
+                    className="p-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-300 cursor-not-allowed shadow-none transition-all"
+                    title="Không thể xóa vì còn công nợ"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => { if (window.confirm('Bạn có chắc chắn muốn xóa đối tác này? Hành động này không thể hoàn tác.')) onDelete(c.id); }}
+                    className="p-2 bg-white border border-slate-200 rounded-xl hover:bg-rose-50 hover:text-rose-500 hover:border-rose-100 shadow-sm transition-all"
+                    title="Xóa đối tác"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                )}
               </div>
             </div>
           ))
