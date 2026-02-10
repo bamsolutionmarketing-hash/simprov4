@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { SaleOrder, InventoryProductStat, SaleOrderWithStats, Customer, DueDateLog, Transaction } from '../types';
-import { formatCurrency, generateCode, generateId, formatDate, formatNumberWithCommas, parseFormattedNumber } from '../utils';
+import { formatCurrency, generateCode, generateId, formatDate, formatNumberWithCommas, parseFormattedNumber, getStartOfMonth, getEndOfMonth } from '../utils';
 import { Plus, Trash2, ShoppingCart } from 'lucide-react';
 import { Modal, ModalActions, Input, Select } from './base';
 
@@ -21,8 +21,8 @@ const SalesList: React.FC<Props> = ({ orders, inventoryStats, customers, getOrde
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPaid, setIsPaid] = useState(true);
   const [paymentMethod, setPaymentMethod] = useState<'TRANSFER' | 'CASH' | 'COD'>('TRANSFER');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+  const [startDate, setStartDate] = useState(getStartOfMonth());
+  const [endDate, setEndDate] = useState(getEndOfMonth());
   const [formData, setFormData] = useState({
     customerId: '', retailCustomerInfo: '', simTypeId: '', quantity: 1,
     salePrice: 0, date: new Date().toISOString().split('T')[0], dueDate: '', note: ''
@@ -117,6 +117,11 @@ const SalesList: React.FC<Props> = ({ orders, inventoryStats, customers, getOrde
         <h2 className="text-lg md:text-2xl font-black text-slate-800 flex items-center gap-2 uppercase tracking-tight">
           <ShoppingCart className="w-6 h-6 md:w-8 md:h-8 text-indigo-600" /> Bán Hàng
         </h2>
+        <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-xl border border-slate-200">
+          <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="bg-transparent text-slate-700 text-[10px] font-bold uppercase tracking-widest focus:outline-none" />
+          <span className="text-slate-400">-</span>
+          <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="bg-transparent text-slate-700 text-[10px] font-bold uppercase tracking-widest focus:outline-none" />
+        </div>
         <button onClick={() => setIsModalOpen(true)} className="bg-indigo-600 text-white px-4 py-2.5 md:px-6 md:py-3 rounded-xl md:rounded-2xl font-bold shadow-lg flex items-center gap-2 text-[9px] md:text-[11px] uppercase tracking-widest"><Plus size={16} /> Đơn Mới</button>
       </div>
 

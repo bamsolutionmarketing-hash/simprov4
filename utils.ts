@@ -67,3 +67,13 @@ export const parseFormattedNumber = (val: string): number => {
   if (!val) return 0;
   return parseInt(val.replace(/,/g, ""), 10) || 0;
 };
+
+export const getStartOfMonth = (): string => {
+  const date = new Date();
+  return new Date(date.getFullYear(), date.getMonth(), 1).toISOString().split('T')[0];
+};
+
+export const getEndOfMonth = (): string => {
+  const date = new Date();
+  return new Date(date.getFullYear(), date.getMonth() + 1, 0).toISOString().split('T')[0];
+};

@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { Transaction, SaleOrderWithStats, SimPackage } from '../types';
-import { formatCurrency, generateCode, generateId, formatDate, formatNumberWithCommas, parseFormattedNumber } from '../utils';
+import { formatCurrency, generateCode, generateId, formatDate, formatNumberWithCommas, parseFormattedNumber, getStartOfMonth, getEndOfMonth } from '../utils';
 import { Plus, Trash2, ArrowUpCircle, ArrowDownCircle, Wallet } from 'lucide-react';
 import { Modal, ModalActions, Input, Select } from './base';
 
@@ -16,24 +16,29 @@ interface Props {
 const CashFlow: React.FC<Props> = ({ transactions, orders, packages, onAdd, onDelete }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [transactionType, setTransactionType] = useState<'IN' | 'OUT'>('IN');
-  const [filterStart, setFilterStart] = useState('');
-  const [filterEnd, setFilterEnd] = useState('');
+  const [transactionType, setTransactionType] = useState<'IN' | 'OUT'>('IN');
+  const [startDate, setStartDate] = useState(getStartOfMonth());
+  const [endDate, setEndDate] = useState(getEndOfMonth());
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0], amount: 0, category: 'Thu bán sỉ', method: 'TRANSFER',
     saleOrderId: '', simPackageId: '', note: ''
   });
 
+  const filteredTransactions = useMemo(() => {
+    return transactions.filter(t =>
+      (!startDate || t.date >= startDate) &&
+      (!endDate || t.date <= endDate)
+    ).sort((a, b) => b.date.localeCompare(a.date));
+  }, [transactions, startDate, endDate]);
+
   const stats = useMemo(() => {
-    const list = transactions.filter(t => (!filterStart || t.date >= filterStart) && (!filterEnd || t.date <= filterEnd));
+    const list = filteredTransactions;
     const getBalance = (method?: string) => {
       const filtered = method ? list.filter(t => t.method === method) : list;
       return filtered.filter(t => t.type === 'IN').reduce((s, t) => s + t.amount, 0) - filtered.filter(t => t.type === 'OUT').reduce((s, t) => s + t.amount, 0);
     };
     return { total: getBalance(), transfer: getBalance('TRANSFER'), cash: getBalance('CASH') };
-  }, [transactions, filterStart, filterEnd]);
-
-  const filteredTransactions = transactions.filter(t => (!filterStart || t.date >= filterStart) && (!filterEnd || t.date <= filterEnd))
-    .sort((a, b) => b.date.localeCompare(a.date));
+  }, [filteredTransactions]);
 
   const pendingOrders = useMemo(() => orders.filter(o => o.remaining > 0), [orders]);
 
@@ -73,6 +78,11 @@ const CashFlow: React.FC<Props> = ({ transactions, orders, packages, onAdd, onDe
         <div className="flex items-center gap-2">
           <Wallet className="w-6 h-6 md:w-8 md:h-8 text-emerald-600" />
           <h2 className="text-lg md:text-2xl font-black text-slate-800 uppercase tracking-tight">Sổ Quỹ</h2>
+        </div>
+        <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-xl border border-slate-200">
+          <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="bg-transparent text-slate-700 text-[10px] font-bold uppercase tracking-widest focus:outline-none" />
+          <span className="text-slate-400">-</span>
+          <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="bg-transparent text-slate-700 text-[10px] font-bold uppercase tracking-widest focus:outline-none" />
         </div>
         <div className="flex gap-2 w-full md:w-auto">
           <button onClick={() => { setTransactionType('IN'); setIsModalOpen(true); }} className="flex-1 md:flex-none bg-emerald-600 text-white px-4 py-2.5 rounded-xl font-bold flex items-center justify-center gap-1.5 text-[9px] uppercase tracking-widest shadow-lg shadow-emerald-50"><Plus size={14} /> Thu</button>
